@@ -48,7 +48,7 @@ export default function Home() {
       {/* Today’s Habits */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Today's Habits</h2>
+          <h2 className="text-lg font-semibold">Today&#39;s Habits</h2>
           <Button asChild><Link href="/habits"><Plus className="mr-2 h-4 w-4" /> Add Habit</Link></Button>
         </div>
         <Card className="rounded-2xl"><CardContent className="p-4"><TodayList /></CardContent></Card>

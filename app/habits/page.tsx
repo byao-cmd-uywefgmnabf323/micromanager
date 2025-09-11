@@ -35,9 +35,9 @@ export default function HabitsPage() {
     setSearch(params.get("q") || "");
   }, [params]);
 
-  const matches = useMemo(() => {
+  const matches: (h: typeof habits[number]) => boolean = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return (h: typeof habits[number]) => true;
+    if (!q) return () => true;
     return (h: typeof habits[number]) =>
       h.title.toLowerCase().includes(q) ||
       (h.description || "").toLowerCase().includes(q) ||
@@ -93,7 +93,7 @@ export default function HabitsPage() {
           <Input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
           <Input placeholder="Description (optional)" value={description} onChange={(e) => setDescription(e.target.value)} />
           <div className="flex items-center gap-2">
-            <Select value={frequency} onValueChange={(v: any) => setFrequency(v)}>
+            <Select value={frequency} onValueChange={(v: "daily" | "weekly" | "x_per_week") => setFrequency(v)}>
               <SelectTrigger><SelectValue placeholder="Frequency" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="daily">Daily</SelectItem>
@@ -107,7 +107,7 @@ export default function HabitsPage() {
           </div>
           <Input type="number" placeholder="Target minutes (optional)" value={targetMinutes ?? ""} onChange={(e) => setTargetMinutes(e.target.value ? parseInt(e.target.value) : undefined)} />
           <div className="flex items-center gap-2">
-            <Select value={category} onValueChange={(v: any) => setCategory(v)}>
+            <Select value={category} onValueChange={(v: string) => setCategory(v)}>
               <SelectTrigger><SelectValue placeholder="Category" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="Health">Health</SelectItem>

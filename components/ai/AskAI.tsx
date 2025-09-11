@@ -39,14 +39,15 @@ export function AskAIButton({ preset }: { preset?: string }) {
       const json = await res.json();
       if (!res.ok) throw new Error(json?.error || "Request failed");
       setResponse(json.content || "");
-    } catch (e: any) {
-      toast.error(e?.message || "AI request failed");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "AI request failed";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
   }
 
-  function useSuggestion(s: string) {
+  function applySuggestion(s: string) {
     setMessage(s);
   }
 
@@ -69,7 +70,7 @@ export function AskAIButton({ preset }: { preset?: string }) {
             <Textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={4} placeholder="Ask for a report, recommendations, planning help..." />
             <div className="flex flex-wrap gap-2">
               {suggestions.map((s, i) => (
-                <Button key={i} size="sm" variant="outline" onClick={() => useSuggestion(s)}>{s}</Button>
+                <Button key={i} size="sm" variant="outline" onClick={() => applySuggestion(s)}>{s}</Button>
               ))}
             </div>
             <div className="flex items-center gap-2">

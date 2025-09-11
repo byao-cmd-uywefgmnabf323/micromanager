@@ -2,34 +2,34 @@
 
 import { ResponsiveContainer, LineChart as RLineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, BarChart as RBarChart, Bar } from "recharts";
 
-export function LineChart({ data, dataKeyX, dataKeyY, color = "#22c55e" }: { data: any[]; dataKeyX: string; dataKeyY: string; color?: string }) {
+export function LineChart<T extends Record<string, unknown>>({ data, dataKeyX, dataKeyY, color = "#22c55e" }: { data: T[]; dataKeyX: keyof T & string; dataKeyY: keyof T & string; color?: string }) {
   if (!data?.length) return <div className="text-sm text-muted-foreground">No data</div>;
   return (
     <div className="h-60">
       <ResponsiveContainer width="100%" height="100%">
-        <RLineChart data={data} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
+        <RLineChart data={data as unknown as object[]} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-          <XAxis dataKey={dataKeyX} tickLine={false} axisLine={false} fontSize={12} />
+          <XAxis dataKey={dataKeyX as string} tickLine={false} axisLine={false} fontSize={12} />
           <YAxis tickLine={false} axisLine={false} fontSize={12} />
           <Tooltip />
-          <Line type="monotone" dataKey={dataKeyY} stroke={color} strokeWidth={2} dot={false} />
+          <Line type="monotone" dataKey={dataKeyY as string} stroke={color} strokeWidth={2} dot={false} />
         </RLineChart>
       </ResponsiveContainer>
     </div>
   );
 }
 
-export function BarChart({ data, dataKeyX, dataKeyY, color = "#6366f1" }: { data: any[]; dataKeyX: string; dataKeyY: string; color?: string }) {
+export function BarChart<T extends Record<string, unknown>>({ data, dataKeyX, dataKeyY, color = "#6366f1" }: { data: T[]; dataKeyX: keyof T & string; dataKeyY: keyof T & string; color?: string }) {
   if (!data?.length) return <div className="text-sm text-muted-foreground">No data</div>;
   return (
     <div className="h-60">
       <ResponsiveContainer width="100%" height="100%">
-        <RBarChart data={data} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
+        <RBarChart data={data as unknown as object[]} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-          <XAxis dataKey={dataKeyX} tickLine={false} axisLine={false} fontSize={12} />
+          <XAxis dataKey={dataKeyX as string} tickLine={false} axisLine={false} fontSize={12} />
           <YAxis tickLine={false} axisLine={false} fontSize={12} />
           <Tooltip />
-          <Bar dataKey={dataKeyY} fill={color} radius={6} />
+          <Bar dataKey={dataKeyY as string} fill={color} radius={6} />
         </RBarChart>
       </ResponsiveContainer>
     </div>
