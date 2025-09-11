@@ -38,8 +38,9 @@ export function ImportExport() {
       }
       importData(json);
       toast.success("Imported data");
-    } catch (err: any) {
-      toast.error(err?.message || "Import failed");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Import failed";
+      toast.error(msg);
     } finally {
       e.target.value = "";
     }

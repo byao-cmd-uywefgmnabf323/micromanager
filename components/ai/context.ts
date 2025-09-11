@@ -64,14 +64,14 @@ export function buildAIContext(habits: Habit[], entries: HabitEntry[]): AIContex
       best: bestHabit ? {
         id: bestHabit.id,
         title: bestHabit.title,
-        icon: (bestHabit as any).icon,
+        icon: bestHabit.icon,
         currentStreak: computeCurrentStreak(bestHabit, entries),
         bestStreak: computeBestStreak(bestHabit, entries),
       } : undefined,
       needsAttention: worstHabit ? {
         id: worstHabit.id,
         title: worstHabit.title,
-        icon: (worstHabit as any).icon,
+        icon: worstHabit.icon,
         currentStreak: computeCurrentStreak(worstHabit, entries),
         bestStreak: computeBestStreak(worstHabit, entries),
       } : undefined,
@@ -80,6 +80,6 @@ export function buildAIContext(habits: Habit[], entries: HabitEntry[]): AIContex
       minutes30,
       weekdayPct,
     },
-    habits: habits.map((h) => ({ id: h.id, title: h.title, icon: (h as any).icon, category: h.category, color: h.color, frequency: h.frequency, timesPerWeek: h.timesPerWeek })),
+    habits: habits.map((h) => ({ id: h.id, title: h.title, icon: h.icon, category: h.category, color: h.color, frequency: h.frequency, timesPerWeek: h.timesPerWeek })),
   };
 }
