@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+export const dynamic = "force-dynamic";
 import { useHabits } from "@/store/useHabits";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,15 @@ import { GripVertical } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useSearchParams } from "next/navigation";
 
+function ParamsController({ setQ }: { setQ: (v: string) => void }) {
+  const params = useSearchParams();
+  useEffect(() => {
+    setQ(params.get("q") || "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
+  return null;
+}
+
 export default function HabitsPage() {
   const habits = useHabits((s) => s.habits);
   const addHabit = useHabits((s) => s.addHabit);
@@ -19,7 +29,6 @@ export default function HabitsPage() {
   const archiveHabit = useHabits((s) => s.archiveHabit);
   const unarchiveHabit = useHabits((s) => s.unarchiveHabit);
   const reorderHabits = useHabits((s) => s.reorderHabits);
-  const params = useSearchParams();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [frequency, setFrequency] = useState<"daily" | "weekly" | "x_per_week">("daily");
@@ -29,11 +38,7 @@ export default function HabitsPage() {
   const hasAny = habits.length > 0;
   const [category, setCategory] = useState<string>("Health");
   const [icon, setIcon] = useState<string>("💪");
-  const [search, setSearch] = useState<string>(params.get("q") || "");
-
-  useEffect(() => {
-    setSearch(params.get("q") || "");
-  }, [params]);
+  const [search, setSearch] = useState<string>("");
 
   const matches: (h: typeof habits[number]) => boolean = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -72,6 +77,7 @@ export default function HabitsPage() {
 
   return (
     <div className="space-y-6">
+      <Suspense fallback={null}><ParamsController setQ={setSearch} /></Suspense>
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Filter</h2>
         <Card className="rounded-2xl"><CardContent className="p-4">
