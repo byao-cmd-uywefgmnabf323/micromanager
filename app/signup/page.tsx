@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
+import { AuthError } from "@/components/auth/AuthError";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -30,21 +31,15 @@ export default function SignupPage() {
     }
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: `${window.location.origin}/login` },
-      });
-      if (error) throw error;
-      if (data.session) {
-        // Email confirmations disabled: you're signed in
-        toast.success("Account created; you're signed in.");
-        router.replace("/dashboard");
-      } else {
-        // Email confirmations enabled: require email verification
-        toast.success("Check your email to confirm your account, then log in.");
-        router.replace("/login");
-      }
+      // Assumption: Confirm email is OFF in Supabase Dashboard.
+      const { error: signUpError } = await supabase.auth.signUp({ email, password });
+      if (signUpError) throw signUpError;
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError) throw signInError;
+
+      router.replace("/dashboard");
+      toast.success("Account created — you're in!");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Signup failed";
       setError(msg);
@@ -89,7 +84,7 @@ export default function SignupPage() {
         <Button type="submit" className="h-11 w-full rounded-xl bg-indigo-100 hover:bg-indigo-200 text-black font-semibold" disabled={loading}>
           {loading ? "Creating account…" : "Sign Up"}
         </Button>
-        <div aria-live="polite" className="text-sm text-red-600 min-h-5">{error}</div>
+        <AuthError message={error} />
       </form>
     </AuthCard>
   );
