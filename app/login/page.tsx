@@ -42,11 +42,28 @@ export default function LoginPage() {
       toast.success("Logged in successfully");
       router.replace("/dashboard");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Login failed";
-      setError(msg);
-      toast.error(msg);
+      const raw = err instanceof Error ? err.message : "Login failed";
+      const friendly = /invalid login credentials/i.test(raw)
+        ? "Invalid credentials. If you just signed up, please confirm your email first and then try again."
+        : raw;
+      setError(friendly);
+      toast.error(friendly);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function resendConfirmation() {
+    if (!email) {
+      setError("Enter your email above and try again.");
+      return;
+    }
+    try {
+      await supabase.auth.resend({ type: "signup", email });
+      toast.success("Confirmation email re-sent.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to resend email";
+      toast.error(msg);
     }
   }
 
@@ -98,7 +115,7 @@ export default function LoginPage() {
       }
     >
       <div className="space-y-4">
-        <Button type="button" variant="outline" className="w-full h-11 rounded-xl justify-between" onClick={onGoogle} disabled={loading}>
+        <Button type="button" variant="outline" className="w-full h-11 rounded-xl justify-between text-black" onClick={onGoogle} disabled={loading}>
           <span className="flex items-center gap-2">
             <GoogleIcon />
             Continue with Google
@@ -131,13 +148,18 @@ export default function LoginPage() {
               <Input id="password" type="password" placeholder="Enter password" className="h-11 rounded-xl pl-10" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
           </div>
-          <Button type="submit" className="h-11 w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold" disabled={loading}>
+          <Button type="submit" className="h-11 w-full rounded-xl bg-indigo-100 hover:bg-indigo-200 text-black font-semibold" disabled={loading}>
             {loading ? "Signing in…" : "Log In"}
           </Button>
           <div className="text-center text-sm">
             or <a href="#" className="text-indigo-600 hover:underline">login with SSO</a>
           </div>
           <div aria-live="polite" className="text-sm text-red-600 min-h-5">{error}</div>
+          {error && error.toLowerCase().includes("confirm") && (
+            <div className="text-xs text-muted-foreground">
+              Didn’t get the email? <button type="button" onClick={resendConfirmation} className="text-indigo-600 hover:underline">Resend confirmation</button>
+            </div>
+          )}
         </form>
       </div>
     </AuthCard>

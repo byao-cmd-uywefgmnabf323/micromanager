@@ -30,10 +30,17 @@ export default function SignupPage() {
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
-      toast.success("Account created");
-      router.replace("/dashboard");
+      if (data.session) {
+        // Email confirmations disabled: you're signed in
+        toast.success("Account created; you're signed in.");
+        router.replace("/dashboard");
+      } else {
+        // Email confirmations enabled: require email verification
+        toast.success("Check your email to confirm your account, then log in.");
+        router.replace("/login");
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Signup failed";
       setError(msg);
@@ -75,7 +82,7 @@ export default function SignupPage() {
             <Input id="confirm" type="password" placeholder="Confirm password" className="h-11 rounded-xl pl-10" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
           </div>
         </div>
-        <Button type="submit" className="h-11 w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold" disabled={loading}>
+        <Button type="submit" className="h-11 w-full rounded-xl bg-indigo-100 hover:bg-indigo-200 text-black font-semibold" disabled={loading}>
           {loading ? "Creating account…" : "Sign Up"}
         </Button>
         <div aria-live="polite" className="text-sm text-red-600 min-h-5">{error}</div>
