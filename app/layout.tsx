@@ -4,11 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { RegisterSW } from "@/components/RegisterSW";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { TopBar } from "@/components/layout/TopBar";
-import { ProgressWidget } from "@/components/ProgressWidget";
-import { AchievementsWatcher } from "@/components/AchievementsWatcher";
-import { RecapModal } from "@/components/RecapModal";
+import { AppShell } from "@/components/layout/AppShell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,28 +32,12 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-dvh bg-background text-foreground`}>
         {/* Theme Provider wraps the entire app */}
         {/* Imports at top of file */}
-        <AppShell>{children}</AppShell>
+        <ThemeProvider>
+          <RegisterSW />
+          <AppShell>{children}</AppShell>
+          <Toaster richColors position="top-right" />
+        </ThemeProvider>
       </body>
     </html>
-  );
-}
-
-// AppShell separated to keep imports at top and body clean
-function AppShell({ children }: { children: React.ReactNode }) {
-  return (
-    <ThemeProvider>
-      <RegisterSW />
-      <div className="flex min-h-dvh w-full">
-        <Sidebar />
-        <div className="flex-1 min-w-0">
-          <TopBar />
-          <main className="mx-auto w-full max-w-[1400px] px-4 py-6">{children}</main>
-        </div>
-      </div>
-      <AchievementsWatcher />
-      <RecapModal />
-      <ProgressWidget />
-      <Toaster richColors position="top-right" />
-    </ThemeProvider>
   );
 }

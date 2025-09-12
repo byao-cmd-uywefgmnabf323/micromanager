@@ -30,7 +30,11 @@ export default function SignupPage() {
     }
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}/login` },
+      });
       if (error) throw error;
       if (data.session) {
         // Email confirmations disabled: you're signed in
@@ -65,21 +69,21 @@ export default function SignupPage() {
           <label htmlFor="email" className="text-sm font-medium">Work Email</label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input id="email" type="email" placeholder="Enter your work email" className="h-11 rounded-xl pl-10" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input id="email" type="email" placeholder="Enter your work email" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
         </div>
         <div className="space-y-1">
           <label htmlFor="password" className="text-sm font-medium">Password</label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input id="password" type="password" placeholder="Enter password" className="h-11 rounded-xl pl-10" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input id="password" type="password" placeholder="Enter password" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
         </div>
         <div className="space-y-1">
           <label htmlFor="confirm" className="text-sm font-medium">Confirm Password</label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input id="confirm" type="password" placeholder="Confirm password" className="h-11 rounded-xl pl-10" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+            <Input id="confirm" type="password" placeholder="Confirm password" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
           </div>
         </div>
         <Button type="submit" className="h-11 w-full rounded-xl bg-indigo-100 hover:bg-indigo-200 text-black font-semibold" disabled={loading}>

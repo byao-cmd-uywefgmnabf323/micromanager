@@ -52,14 +52,14 @@ export default function ResetPasswordPage() {
           <label htmlFor="password" className="text-sm font-medium">New Password</label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input id="password" type="password" placeholder="Enter new password" className="h-11 rounded-xl pl-10" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input id="password" type="password" placeholder="Enter new password" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
         </div>
         <div className="space-y-1">
           <label htmlFor="confirm" className="text-sm font-medium">Confirm Password</label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input id="confirm" type="password" placeholder="Confirm new password" className="h-11 rounded-xl pl-10" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+            <Input id="confirm" type="password" placeholder="Confirm new password" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
           </div>
         </div>
         <Button type="submit" className="h-11 w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold" disabled={loading || !ready}>

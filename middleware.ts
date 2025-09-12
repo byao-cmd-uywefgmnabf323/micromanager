@@ -29,6 +29,7 @@ export async function middleware(req: NextRequest) {
   const url = new URL(req.url);
   const isProtected = url.pathname.startsWith("/dashboard") || url.pathname.startsWith("/(protected)");
   const isAuthPage = url.pathname === "/login" || url.pathname === "/signup";
+  const isRoot = url.pathname === "/";
 
   if (isProtected && !user) {
     const redirectUrl = new URL("/login", req.url);
@@ -40,9 +41,13 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
+  if (isRoot) {
+    return NextResponse.redirect(new URL(user ? "/dashboard" : "/login", req.url));
+  }
+
   return res;
 }
 
 export const config = {
-  matcher: ["/login", "/signup", "/dashboard", "/(protected)/(.*)"],
+  matcher: ["/", "/login", "/signup", "/dashboard", "/(protected)/(.*)"],
 };
