@@ -43,27 +43,11 @@ export default function LoginPage() {
       router.replace("/dashboard");
     } catch (err: unknown) {
       const raw = err instanceof Error ? err.message : "Login failed";
-      const friendly = /invalid login credentials/i.test(raw)
-        ? "Invalid credentials. If you just signed up, please confirm your email first and then try again."
-        : raw;
-      setError(friendly);
-      toast.error(friendly);
+      const message = /invalid login credentials/i.test(raw) ? "Invalid email or password." : raw;
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function resendConfirmation() {
-    if (!email) {
-      setError("Enter your email above and try again.");
-      return;
-    }
-    try {
-      await supabase.auth.resend({ type: "signup", email });
-      toast.success("Confirmation email re-sent.");
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to resend email";
-      toast.error(msg);
     }
   }
 
@@ -155,11 +139,6 @@ export default function LoginPage() {
             or <a href="#" className="text-indigo-600 hover:underline">login with SSO</a>
           </div>
           <div aria-live="polite" className="text-sm text-red-600 min-h-5">{error}</div>
-          {error && error.toLowerCase().includes("confirm") && (
-            <div className="text-xs text-muted-foreground">
-              Didn’t get the email? <button type="button" onClick={resendConfirmation} className="text-indigo-600 hover:underline">Resend confirmation</button>
-            </div>
-          )}
         </form>
       </div>
     </AuthCard>
