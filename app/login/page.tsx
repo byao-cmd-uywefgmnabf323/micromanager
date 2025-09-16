@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
+import { AuthError } from "@/components/auth/AuthError";
+import { normalizeEmail, normalizePassword } from "@/lib/authUtils";
+import { DevEnvBanner } from "@/components/auth/DevEnvBanner";
 
 function GoogleIcon() {
   return (
@@ -37,15 +40,16 @@ export default function LoginPage() {
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const emailN = normalizeEmail(email);
+      const passwordN = normalizePassword(password);
+      const { error } = await supabase.auth.signInWithPassword({ email: emailN, password: passwordN });
       if (error) throw error;
       toast.success("Logged in successfully");
       router.replace("/dashboard");
     } catch (err: unknown) {
       const raw = err instanceof Error ? err.message : "Login failed";
-      const message = /invalid login credentials/i.test(raw) ? "Invalid email or password." : raw;
-      setError(message);
-      toast.error(message);
+      setError(raw);
+      toast.error(raw);
     } finally {
       setLoading(false);
     }
@@ -89,7 +93,9 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthCard
+    <>
+      <DevEnvBanner />
+      <AuthCard
       heading="Welcome back!"
       subheading="Log in to continue"
       footer={
@@ -119,7 +125,7 @@ export default function LoginPage() {
             <label htmlFor="email" className="text-sm font-medium">Work Email</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input id="email" type="email" placeholder="Enter your work email" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input id="email" type="email" placeholder="Enter your work email" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={email} onChange={(e) => setEmail(e.target.value)} onBlur={(e) => setEmail(normalizeEmail(e.target.value))} />
             </div>
           </div>
           <div className="space-y-1">
@@ -129,7 +135,7 @@ export default function LoginPage() {
             </div>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input id="password" type="password" placeholder="Enter password" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input id="password" type="password" placeholder="Enter password" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={password} onChange={(e) => setPassword(e.target.value)} onBlur={(e) => setPassword(normalizePassword(e.target.value))} />
             </div>
           </div>
           <Button type="submit" className="h-11 w-full rounded-xl bg-indigo-100 hover:bg-indigo-200 text-black font-semibold" disabled={loading}>
@@ -138,9 +144,10 @@ export default function LoginPage() {
           <div className="text-center text-sm">
             or <a href="#" className="text-indigo-600 hover:underline">login with SSO</a>
           </div>
-          <div aria-live="polite" className="text-sm text-red-600 min-h-5">{error}</div>
+          <AuthError message={error} />
         </form>
       </div>
     </AuthCard>
+    </>
   );
 }

@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { AuthError } from "@/components/auth/AuthError";
+import { normalizeEmail, normalizePassword } from "@/lib/authUtils";
+import { DevEnvBanner } from "@/components/auth/DevEnvBanner";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -25,21 +27,28 @@ export default function SignupPage() {
       setError("Please fill in all fields.");
       return;
     }
-    if (password !== confirm) {
+    const emailN = normalizeEmail(email);
+    const passwordN = normalizePassword(password);
+    const confirmN = normalizePassword(confirm);
+    if (passwordN !== confirmN) {
       setError("Passwords do not match.");
+      return;
+    }
+    if (passwordN.length < 6) {
+      setError("Password must be at least 6 characters.");
       return;
     }
     setLoading(true);
     try {
       // Assumption: Confirm email is OFF in Supabase Dashboard.
-      const { error: signUpError } = await supabase.auth.signUp({ email, password });
+      const { error: signUpError } = await supabase.auth.signUp({ email: emailN, password: passwordN });
       if (signUpError) throw signUpError;
 
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email: emailN, password: passwordN });
       if (signInError) throw signInError;
 
-      router.replace("/dashboard");
       toast.success("Account created — you're in!");
+      router.push("/dashboard");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Signup failed";
       setError(msg);
@@ -50,6 +59,8 @@ export default function SignupPage() {
   }
 
   return (
+    <>
+    <DevEnvBanner />
     <AuthCard
       heading="Create your account"
       subheading="Start building habits with Micromanager"
@@ -64,21 +75,21 @@ export default function SignupPage() {
           <label htmlFor="email" className="text-sm font-medium">Work Email</label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input id="email" type="email" placeholder="Enter your work email" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input id="email" type="email" placeholder="Enter your work email" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={email} onChange={(e) => setEmail(e.target.value)} onBlur={(e) => setEmail(normalizeEmail(e.target.value))} />
           </div>
         </div>
         <div className="space-y-1">
           <label htmlFor="password" className="text-sm font-medium">Password</label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input id="password" type="password" placeholder="Enter password" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input id="password" type="password" placeholder="Enter password" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={password} onChange={(e) => setPassword(e.target.value)} onBlur={(e) => setPassword(normalizePassword(e.target.value))} />
           </div>
         </div>
         <div className="space-y-1">
           <label htmlFor="confirm" className="text-sm font-medium">Confirm Password</label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input id="confirm" type="password" placeholder="Confirm password" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+            <Input id="confirm" type="password" placeholder="Confirm password" className="h-11 rounded-xl pl-10 text-black placeholder-gray-500" value={confirm} onChange={(e) => setConfirm(e.target.value)} onBlur={(e) => setConfirm(normalizePassword(e.target.value))} />
           </div>
         </div>
         <Button type="submit" className="h-11 w-full rounded-xl bg-indigo-100 hover:bg-indigo-200 text-black font-semibold" disabled={loading}>
@@ -87,5 +98,6 @@ export default function SignupPage() {
         <AuthError message={error} />
       </form>
     </AuthCard>
+    </>
   );
 }
