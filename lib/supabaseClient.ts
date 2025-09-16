@@ -7,7 +7,6 @@ const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 if (!url || !anon) {
   // Visible during build/runtime to catch bad envs
-  // eslint-disable-next-line no-console
   console.warn("Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY");
 }
 
