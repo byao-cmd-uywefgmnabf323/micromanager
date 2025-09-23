@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 const NAV_ITEMS = [
   { href: "/", label: "Home", icon: Home },
   { href: "/habits", label: "Habits", icon: ListTodo },
-  { href: "/journal", label: "Journal", icon: FileText },
   { href: "/badges", label: "Badges", icon: Medal },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/planner", label: "Planner", icon: Calendar },
@@ -107,29 +106,6 @@ export function Sidebar() {
             })}
           </nav>
 
-          {/* Favorites */}
-          <div className="px-3 py-2">
-            {!collapsed && <div className="text-xs uppercase text-muted-foreground mb-1">Favorites</div>}
-            <div className="space-y-1">
-              {(SAMPLE_SPACES.flatMap((s) => s.favorites)).map((fav) => (
-                collapsed ? (
-                  <Tooltip key={fav}>
-                    <TooltipTrigger asChild>
-                      <Link href={`/habits?q=${encodeURIComponent(fav)}`} className="flex items-center justify-center px-2 py-1.5 rounded hover:bg-muted">
-                        <Star className="h-4 w-4 text-yellow-400" />
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">{fav}</TooltipContent>
-                  </Tooltip>
-                ) : (
-                  <Link key={fav} href={`/habits?q=${encodeURIComponent(fav)}`} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted">
-                    <Star className="h-4 w-4 text-yellow-400" />
-                    <span className="text-sm truncate">{fav}</span>
-                  </Link>
-                )
-              ))}
-            </div>
-          </div>
 
           {/* Spaces tree */}
           <div className="px-3 py-2 overflow-auto">
@@ -171,17 +147,6 @@ export function Sidebar() {
             </div>
           </div>
 
-          {/* Bottom actions */}
-          <div className="mt-auto px-3 py-3 border-t">
-            <div className={cn("flex items-center gap-2 px-2 py-2 rounded hover:bg-muted", collapsed && "justify-center") }>
-              <Users className="h-4 w-4" />
-              {!collapsed && <span className="text-sm">Invite</span>}
-            </div>
-            <div className={cn("mt-2 flex items-center gap-2 px-2 py-2 rounded bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:opacity-90", collapsed && "justify-center") }>
-              <Rocket className="h-4 w-4" />
-              {!collapsed && <span className="text-sm font-medium">Upgrade</span>}
-            </div>
-          </div>
         </div>
       </aside>
     </TooltipProvider>

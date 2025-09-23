@@ -14,9 +14,7 @@ import { AskAIButton } from "@/components/ai/AskAI";
 export default function AnalyticsPage() {
   const entries = useHabits((s) => s.entries);
   const habits = useHabits((s) => s.habits);
-  const [onlyNotes, setOnlyNotes] = useState(false);
-  const notesDateSet = useMemo(() => new Set(entries.filter((e) => (e.note || "").trim().length > 0).map((e) => e.date)), [entries]);
-  const filteredEntries = useMemo(() => (onlyNotes ? entries.filter((e) => notesDateSet.has(e.date)) : entries), [entries, onlyNotes, notesDateSet]);
+  const filteredEntries = entries;
   const days = getLastNDates(30);
   const minutes = minutesSummary(filteredEntries, undefined, 30);
   const lineData = days.map((d) => ({ date: d.slice(5), minutes: minutes.dayTotals.get(d) || 0 }));
@@ -31,9 +29,6 @@ export default function AnalyticsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-2">
         <AskAIButton preset="Create a personalized analysis of my consistency and clear next-step recommendations." />
-        <Button size="sm" variant={onlyNotes ? "default" : "outline"} onClick={() => setOnlyNotes((v) => !v)}>
-          {onlyNotes ? "Showing: Days with journal notes" : "Filter: Notes only"}
-        </Button>
       </div>
       {!hasEntries ? (
         <div className="space-y-6">
