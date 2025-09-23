@@ -1,12 +1,12 @@
 {
-  "$schema": "https://ui.shadcn.com/schema.json",
+  "$schema": "https://v3.shadcn.com/schema.json",
   "style": "new-york",
   "rsc": true,
   "tsx": true,
   "tailwind": {
     "config": "",
     "css": "app/globals.css",
-    "baseColor": "stone",
+    "baseColor": "neutral",
     "cssVariables": true,
     "prefix": ""
   },
