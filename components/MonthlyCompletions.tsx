@@ -37,10 +37,14 @@ export function MonthlyCompletions({ days = 30 }: { days?: number }) {
   }, [daysArr, perDayDone]);
 
   return (
-    <Card className="rounded-2xl">
-      <CardHeader className="pb-2"><CardTitle className="text-base">Monthly Completions</CardTitle></CardHeader>
-      <CardContent className="pt-2">
-        <LineChart data={data} dataKeyX="date" dataKeyY="completions" color="#22c55e" />
+    <Card className="rounded-2xl bg-neutral-900 border border-neutral-800 shadow-sm hover:border-neutral-700 transition-colors">
+      <CardHeader className="p-6 pb-2">
+        <CardTitle className="text-2xl font-semibold">Monthly Completions</CardTitle>
+      </CardHeader>
+      <CardContent className="p-6 pt-2">
+        <div className="h-72">
+          <LineChart data={data} dataKeyX="date" dataKeyY="completions" color="#22c55e" />
+        </div>
       </CardContent>
     </Card>
   );

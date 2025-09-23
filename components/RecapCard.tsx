@@ -77,25 +77,27 @@ export function RecapCard({ days = 7, showTrend = true }: { days?: number; showT
   }, [windowDates, doneSetByDay]);
 
   return (
-    <Card className="rounded-2xl">
-      <CardHeader className="pb-2"><CardTitle className="text-base">Weekly Recap</CardTitle></CardHeader>
-      <CardContent className="pt-2 space-y-2">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg border p-3">
-            <div className="text-xs text-muted-foreground">Weekly completion</div>
-            <div className="text-2xl font-semibold">{weeklyPct}%</div>
+    <Card className="rounded-2xl bg-neutral-900 border border-neutral-800 shadow-sm hover:border-neutral-700 transition-colors">
+      <CardHeader className="p-6 pb-2">
+        <CardTitle className="text-2xl font-semibold">Weekly Recap</CardTitle>
+      </CardHeader>
+      <CardContent className="p-6 pt-2 space-y-4">
+        <div className="grid gap-6 sm:grid-cols-3">
+          <div className="space-y-1">
+            <div className="text-sm text-neutral-400">Weekly completion</div>
+            <div className="text-3xl font-bold">{weeklyPct}%</div>
           </div>
-          <div className="rounded-lg border p-3">
-            <div className="text-xs text-muted-foreground">Best habit</div>
-            <div className="text-sm font-medium truncate">{bestHabit ? (<><span className="mr-1">{bestHabit.icon}</span>{bestHabit.title}</>) : "—"}</div>
+          <div className="space-y-1">
+            <div className="text-sm text-neutral-400">Best habit</div>
+            <div className="text-lg font-medium truncate">{bestHabit ? (<><span className="mr-1">{bestHabit.icon}</span>{bestHabit.title}</>) : "—"}</div>
           </div>
-          <div className="rounded-lg border p-3">
-            <div className="text-xs text-muted-foreground">Needs attention</div>
-            <div className="text-sm font-medium truncate">{needsAttention ? (<><span className="mr-1">{needsAttention.icon}</span>{needsAttention.title}</>) : "—"}</div>
+          <div className="space-y-1">
+            <div className="text-sm text-neutral-400">Needs attention</div>
+            <div className="text-lg font-medium truncate">{needsAttention ? (<><span className="mr-1">{needsAttention.icon}</span>{needsAttention.title}</>) : "—"}</div>
           </div>
         </div>
         {showTrend && (
-          <div className="mt-2 text-xs text-muted-foreground">Last {windowDates.length} days done/task count per day</div>
+          <div className="mt-4 text-xs text-neutral-500">Last {windowDates.length} days done/task count per day</div>
         )}
       </CardContent>
     </Card>

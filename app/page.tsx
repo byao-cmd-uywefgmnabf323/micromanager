@@ -1,63 +1,56 @@
-import Link from "next/link";
-import { QuoteCard } from "@/components/QuoteCard";
-import { StreakCounter } from "@/components/StreakCounter";
-import { ProgressRing } from "@/components/ProgressRing";
-import { Heatmap } from "@/components/Heatmap";
-import { TodayList } from "@/components/TodayList";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useHabits } from "@/store/useHabits";
 import { RecapCard } from "@/components/RecapCard";
 import { MonthlyCompletions } from "@/components/MonthlyCompletions";
-import { MiniTimeline } from "@/components/MiniTimeline";
-import { AskAIButton } from "@/components/ai/AskAI";
+import { AchievementsWatcher } from "@/components/AchievementsWatcher";
+import Link from "next/link";
 
-export default function Home() {
+export default function DashboardPage() {
+  const habits = useHabits((s) => s.habits);
+  const activeHabits = habits.filter(h => !h.isArchived);
+
   return (
     <div className="space-y-6">
-      {/* Top: Quote */}
-      <QuoteCard />
-
-      {/* Ask AI quick access */}
-      <div className="flex items-center justify-end">
-        <AskAIButton />
-      </div>
-
-      {/* Widgets Row */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <StreakCounter />
-        <Card className="rounded-2xl">
-          <CardHeader className="pb-2"><CardTitle className="text-base">Progress</CardTitle></CardHeader>
-          <CardContent className="pt-2"><ProgressRing /></CardContent>
-        </Card>
-        <Card className="rounded-2xl md:col-span-2 lg:col-span-1">
-          <CardHeader className="pb-2"><CardTitle className="text-base">Consistency</CardTitle></CardHeader>
-          <CardContent className="pt-2"><Heatmap days={90} /></CardContent>
-        </Card>
-      </div>
-
-      {/* Weekly Recap */}
-      <RecapCard days={7} />
-
-      {/* 7-day Mini Timeline */}
-      <MiniTimeline days={7} />
-
-      {/* Monthly trendline */}
-      <MonthlyCompletions days={30} />
-
-      {/* Today’s Habits */}
-      <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Today&#39;s Habits</h2>
-          <Button asChild><Link href="/habits"><Plus className="mr-2 h-4 w-4" /> Add Habit</Link></Button>
+      <AchievementsWatcher />
+      
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">Dashboard</h1>
+          <p className="text-sm text-neutral-400 mt-1">A quick overview of your progress.</p>
         </div>
-        <Card className="rounded-2xl"><CardContent className="p-4"><TodayList /></CardContent></Card>
-      </section>
+      </div>
 
-      {/* Floating Quick Add */}
-      <Button asChild className="fixed bottom-24 right-4 rounded-full shadow-lg" size="lg">
-        <Link href="/habits"><Plus className="mr-2 h-5 w-5" /> Add Habit</Link>
-      </Button>
+      {/* Main Content */}
+      <div className="space-y-6">
+        {/* Weekly Recap (Full Width) */}
+        <RecapCard />
+
+        {/* Two-Column Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <MonthlyCompletions />
+          
+          <Card className="rounded-2xl bg-neutral-900 border border-neutral-800 shadow-sm hover:border-neutral-700 transition-colors">
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-3">
+              <Button asChild>
+                <Link href="/today">Track Today</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/habits">Manage Habits</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/analytics">View Analytics</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
