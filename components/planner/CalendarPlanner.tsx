@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -9,54 +8,32 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { TaskModal, Task } from './TaskModal';
-import { supabase } from '@/lib/supabaseClient';
-import { EventSourceInput } from '@fullcalendar/core';
+import { useHabits } from '@/store/useHabits';
 import { toast } from 'sonner';
 
 export function CalendarPlanner() {
   const calendarRef = useRef<FullCalendar>(null);
-  const router = useRouter();
   const [modalState, setModalState] = useState<{ isOpen: boolean; task: Task | null }>({ isOpen: false, task: null });
   const [currentTitle, setCurrentTitle] = useState('');
-  const [tasks, setTasks] = useState<any[]>([]);
 
-  // Auth check
+  const tasks = useHabits((s) => s.tasks);
+  const addTask = useHabits((s) => s.addTask);
+  const updateTask = useHabits((s) => s.updateTask);
+  const deleteTask = useHabits((s) => s.deleteTask);
+
+  const events = useMemo(() => tasks.map(t => ({
+    id: t.id,
+    title: t.title,
+    start: t.start,
+    end: t.end,
+    allDay: t.all_day,
+    extendedProps: { notes: t.notes, status: t.status },
+  })), [tasks]);
+
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.replace('/login');
-      }
-    };
-    checkSession();
-  }, [router]);
-
-  const fetchTasks = useCallback(async (fetchInfo: any, successCallback: (events: any) => void, failureCallback: (error: any) => void) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return failureCallback('Not authenticated');
-
-    try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .gte('start', fetchInfo.start.toISOString())
-        .lte('start', fetchInfo.end.toISOString());
-
-      if (error) throw error;
-
-      const events = data.map(t => ({
-        id: t.id,
-        title: t.title,
-        start: t.start,
-        end: t.end,
-        allDay: t.all_day,
-        extendedProps: { notes: t.notes, status: t.status },
-      }));
-      successCallback(events);
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
-      failureCallback(error);
+    if (calendarRef.current) {
+      const api = calendarRef.current.getApi();
+      setCurrentTitle(api.view.title);
     }
   }, []);
 
@@ -71,7 +48,7 @@ export function CalendarPlanner() {
   const handleEventClick = (arg: any) => {
     const task = tasks.find(t => t.id === arg.event.id);
     if (task) {
-      setModalState({ isOpen: true, task: { ...task, start: task.start, end: task.end, all_day: task.all_day } });
+      setModalState({ isOpen: true, task });
     }
   };
 
@@ -79,34 +56,14 @@ export function CalendarPlanner() {
     setModalState({ isOpen: false, task: null });
   };
 
-  const handleModalSave = async (task: Task) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-
-    const taskToSave = {
-      user_id: session.user.id,
-      title: task.title,
-      notes: task.notes,
-      start: new Date(task.start).toISOString(),
-      end: task.end ? new Date(task.end).toISOString() : null,
-      all_day: task.all_day,
-      status: task.status,
-    };
-
+  const handleModalSave = (task: Task) => {
     try {
-      let error;
       if (task.id) {
-        const { error: updateError } = await supabase.from('tasks').update(taskToSave).eq('id', task.id);
-        error = updateError;
+        updateTask(task.id, task);
       } else {
-        const { error: insertError } = await supabase.from('tasks').insert(taskToSave);
-        error = insertError;
+        addTask(task);
       }
-
-      if (error) throw error;
-
       toast.success('Task saved successfully.');
-      calendarRef.current?.getApi().refetchEvents();
       handleModalClose();
     } catch (error) {
       console.error('Error saving task:', error);
@@ -114,12 +71,10 @@ export function CalendarPlanner() {
     }
   };
 
-  const handleModalDelete = async (taskId: string) => {
+  const handleModalDelete = (taskId: string) => {
     try {
-      const { error } = await supabase.from('tasks').delete().eq('id', taskId);
-      if (error) throw error;
+      deleteTask(taskId);
       toast.success('Task deleted.');
-      calendarRef.current?.getApi().refetchEvents();
       handleModalClose();
     } catch (error) {
       console.error('Error deleting task:', error);
@@ -127,16 +82,14 @@ export function CalendarPlanner() {
     }
   };
 
-  const handleEventUpdate = async (updateInfo: any) => {
+  const handleEventUpdate = (updateInfo: any) => {
     const { event } = updateInfo;
-    const taskToUpdate = {
-      start: event.start.toISOString(),
-      end: event.end ? event.end.toISOString() : event.start.toISOString(),
-      all_day: event.allDay,
-    };
     try {
-      const { error } = await supabase.from('tasks').update(taskToUpdate).eq('id', event.id);
-      if (error) throw error;
+      updateTask(event.id, {
+        start: event.start.toISOString(),
+        end: event.end ? event.end.toISOString() : event.start.toISOString(),
+        all_day: event.allDay,
+      });
       toast.success('Task updated.');
     } catch (error) {
       console.error('Error updating task:', error);
@@ -204,7 +157,7 @@ export function CalendarPlanner() {
           dateClick={handleDateClick}
           select={handleSelect}
           eventClick={handleEventClick}
-          events={fetchTasks as EventSourceInput}
+          events={events}
           eventDrop={handleEventUpdate}
           eventResize={handleEventUpdate}
         />

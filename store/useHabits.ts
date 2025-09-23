@@ -13,9 +13,12 @@ export type CheckInPayload = {
   note?: string;
 };
 
+import { Task as PlannerTask } from "@/components/planner/TaskModal";
+
 export type HabitsState = {
   habits: Habit[];
   entries: HabitEntry[];
+  tasks: PlannerTask[];
   initialized: boolean;
   // CRUD habits
   addHabit: (h: Omit<Habit, "id" | "createdAt" | "isArchived">) => Habit;
@@ -26,9 +29,13 @@ export type HabitsState = {
   reorderHabits: (ids: string[]) => void;
   // Check-ins
   checkIn: (habitId: string, payload: CheckInPayload) => HabitEntry;
+  // Planner Tasks
+  addTask: (task: Omit<PlannerTask, "id">) => PlannerTask;
+  updateTask: (id: string, patch: Partial<PlannerTask>) => void;
+  deleteTask: (id: string) => void;
   // Import/Export
-  exportData: () => { habits: Habit[]; entries: HabitEntry[] };
-  importData: (data: { habits: Habit[]; entries: HabitEntry[] }) => void;
+  exportData: () => { habits: Habit[]; entries: HabitEntry[]; tasks: PlannerTask[] };
+  importData: (data: { habits: Habit[]; entries: HabitEntry[]; tasks?: PlannerTask[] }) => void;
   // Maintenance
   clearAll: () => void;
 };
@@ -43,6 +50,7 @@ export const useHabits = create<HabitsState>()(
     (set, get) => ({
       habits: [],
       entries: [],
+      tasks: [],
       initialized: false,
 
       addHabit: (h) => {
@@ -88,6 +96,20 @@ export const useHabits = create<HabitsState>()(
         });
       },
 
+      addTask: (task) => {
+        const newTask: PlannerTask = { ...task, id: genId() };
+        set((s) => ({ tasks: [...s.tasks, newTask] }));
+        return newTask;
+      },
+
+      updateTask: (id, patch) => {
+        set((s) => ({ tasks: s.tasks.map((t) => (t.id === id ? { ...t, ...patch } : t)) }));
+      },
+
+      deleteTask: (id) => {
+        set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id) }));
+      },
+
       checkIn: (habitId, payload) => {
         const date = payload.date || toYYYYMMDD();
         const entry: HabitEntry = {
@@ -105,20 +127,20 @@ export const useHabits = create<HabitsState>()(
 
       exportData: () => {
         const s = get();
-        return { habits: s.habits, entries: s.entries };
+        return { habits: s.habits, entries: s.entries, tasks: s.tasks };
       },
 
       importData: (data) => {
-        set(() => ({ habits: data.habits || [], entries: data.entries || [] }));
+        set(() => ({ habits: data.habits || [], entries: data.entries || [], tasks: data.tasks || [] }));
       },
 
       clearAll: () => {
-        set(() => ({ habits: [], entries: [] }));
+        set(() => ({ habits: [], entries: [], tasks: [] }));
       },
     }),
     {
       name: "micromanager_store",
-      partialize: (s) => ({ habits: s.habits, entries: s.entries }),
+      partialize: (s) => ({ habits: s.habits, entries: s.entries, tasks: s.tasks }),
       onRehydrateStorage: () => (state) => {
         // After hydration, seed demo data if empty
         if (!state) return;
