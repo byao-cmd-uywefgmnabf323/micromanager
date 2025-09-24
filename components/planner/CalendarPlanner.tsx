@@ -140,7 +140,7 @@ export function CalendarPlanner() {
       </div>
 
       {/* Calendar */}
-      <div className="h-[75vh]">
+      <div>
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -150,6 +150,7 @@ export function CalendarPlanner() {
           selectable={true}
           selectMirror={true}
           dayMaxEvents={true}
+          aspectRatio={1.5}
           dateClick={handleDateClick}
           select={handleSelect}
           eventClick={handleEventClick}
