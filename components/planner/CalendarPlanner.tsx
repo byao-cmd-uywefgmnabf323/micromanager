@@ -4,7 +4,8 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
+import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
+import { EventClickArg, EventDropArg, DateSelectArg } from '@fullcalendar/core';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { TaskModal, Task } from './TaskModal';
@@ -37,15 +38,15 @@ export function CalendarPlanner() {
     }
   }, []);
 
-  const handleDateClick = (arg: any) => {
+  const handleDateClick = (arg: DateClickArg) => {
     setModalState({ isOpen: true, task: { title: '', start: arg.dateStr, all_day: true, status: 'todo' } });
   };
 
-  const handleSelect = (arg: any) => {
+  const handleSelect = (arg: DateSelectArg) => {
     setModalState({ isOpen: true, task: { title: '', start: arg.startStr, end: arg.endStr, all_day: arg.allDay, status: 'todo' } });
   };
 
-  const handleEventClick = (arg: any) => {
+  const handleEventClick = (arg: EventClickArg) => {
     const task = tasks.find(t => t.id === arg.event.id);
     if (task) {
       setModalState({ isOpen: true, task });
@@ -82,21 +83,16 @@ export function CalendarPlanner() {
     }
   };
 
-  const handleEventUpdate = (updateInfo: any) => {
-    const { event } = updateInfo;
-    try {
-      updateTask(event.id, {
-        start: event.start.toISOString(),
-        end: event.end ? event.end.toISOString() : event.start.toISOString(),
-        all_day: event.allDay,
-      });
-      toast.success('Task updated.');
-    } catch (error) {
-      console.error('Error updating task:', error);
-      toast.error('Failed to update task.');
-      updateInfo.revert();
-    }
+  const handleEventDrop = (dropInfo: EventDropArg) => {
+    if (!dropInfo.event.start) return;
+    updateTask(dropInfo.event.id, {
+      start: dropInfo.event.start.toISOString(),
+      end: dropInfo.event.end ? dropInfo.event.end.toISOString() : dropInfo.event.start.toISOString(),
+      all_day: dropInfo.event.allDay,
+    });
+    toast.success('Task updated.');
   };
+
 
   const handlePrev = () => {
     const api = calendarRef.current?.getApi();
@@ -158,9 +154,8 @@ export function CalendarPlanner() {
           select={handleSelect}
           eventClick={handleEventClick}
           events={events}
-          eventDrop={handleEventUpdate}
-          eventResize={handleEventUpdate}
-        />
+          eventDrop={handleEventDrop}
+                  />
       </div>
 
       <TaskModal
