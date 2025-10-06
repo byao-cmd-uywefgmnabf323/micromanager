@@ -38,11 +38,11 @@ export function MonthlyCompletions({ days = 30 }: { days?: number }) {
 
   return (
     <Card className="rounded-2xl bg-neutral-900 border border-neutral-800 shadow-sm hover:border-neutral-700 transition-colors">
-      <CardHeader className="p-6 pb-2">
-        <CardTitle className="text-2xl font-semibold">Monthly Completions</CardTitle>
+      <CardHeader className="p-4 pb-1">
+        <CardTitle className="text-xl font-semibold">Monthly Completions</CardTitle>
       </CardHeader>
-      <CardContent className="p-6 pt-2">
-        <div className="h-72">
+      <CardContent className="p-4 pt-1">
+        <div className="h-56">
           <LineChart data={data} dataKeyX="date" dataKeyY="completions" color="#22c55e" />
         </div>
       </CardContent>

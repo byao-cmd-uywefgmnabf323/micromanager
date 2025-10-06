@@ -62,35 +62,35 @@ export function Sidebar() {
     <TooltipProvider>
       <aside className={cn(
         "sticky top-0 h-dvh shrink-0 border-r bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/70",
-        collapsed ? "w-[72px]" : "w-64"
+        collapsed ? "w-[72px]" : "w-56"
       )}>
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="flex items-center gap-2 px-3 py-3 border-b">
+          <div className="flex items-center gap-2 px-2.5 py-2 border-b">
             <div className="h-8 w-8 rounded-md bg-gradient-to-tr from-purple-500 to-blue-500" />
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <div className="font-semibold leading-tight truncate">Workspace Alpha</div>
-                <button className="text-xs text-muted-foreground hover:underline">Switch workspace</button>
+                <button className="text-[11px] text-muted-foreground hover:underline">Switch workspace</button>
               </div>
             )}
-            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Toggle sidebar" onClick={() => setCollapsed((v) => !v)}>
+            <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Toggle sidebar" onClick={() => setCollapsed((v) => !v)}>
               {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
             </Button>
           </div>
 
           {/* Main nav */}
-          <nav className="px-2 py-3 space-y-1">
+          <nav className="px-2 py-2 space-y-0.5">
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               const active = pathname === item.href;
               const content = (
                 <div className={cn(
-                  "flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-muted",
+                  "flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-muted",
                   active && "bg-muted text-foreground"
                 )}>
                   <Icon className="h-5 w-5" />
-                  {!collapsed && <span className="truncate text-sm">{item.label}</span>}
+                  {!collapsed && <span className="truncate text-[13px]">{item.label}</span>}
                 </div>
               );
               return collapsed ? (
@@ -108,7 +108,7 @@ export function Sidebar() {
 
 
           {/* Spaces tree */}
-          <div className="px-3 py-2 overflow-auto">
+          <div className="px-2.5 py-2 overflow-auto">
             {!collapsed && <div className="text-xs uppercase text-muted-foreground mb-1">Spaces</div>}
             <div className="space-y-1">
               {SAMPLE_SPACES.map((space) => {
@@ -119,21 +119,21 @@ export function Sidebar() {
                       onClick={() => toggleSpace(space.id)}>
                       <ChevronDown className={cn("h-4 w-4 transition", !open && "-rotate-90", collapsed && "hidden")} />
                       <Folder className="h-4 w-4" />
-                      {!collapsed && <span className="text-sm font-medium truncate">{space.name}</span>}
+                      {!collapsed && <span className="text-[13px] font-medium truncate">{space.name}</span>}
                     </button>
                     {open && (
-                      <div className={cn("mt-1 pl-6 space-y-1", collapsed && "hidden") }>
+                      <div className={cn("mt-0.5 pl-6 space-y-0.5", collapsed && "hidden") }>
                         {space.projects.map((p) => (
                           <div key={p.id} className="">
                             <Link href={`/habits?q=${encodeURIComponent(p.name)}`} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted">
                               <Folder className="h-4 w-4" />
-                              <span className="text-sm truncate">{p.name}</span>
+                              <span className="text-[13px] truncate">{p.name}</span>
                             </Link>
-                            <div className="pl-6 space-y-1">
+                            <div className="pl-6 space-y-0.5">
                               {p.notes.map((n) => (
                                 <Link key={n} href={`/habits?q=${encodeURIComponent(n)}`} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted">
                                   <FileText className="h-4 w-4" />
-                                  <span className="text-sm truncate">{n}</span>
+                                  <span className="text-[13px] truncate">{n}</span>
                                 </Link>
                               ))}
                             </div>

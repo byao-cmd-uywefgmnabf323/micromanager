@@ -15,7 +15,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Sidebar />
         <div className="flex-1 min-w-0">
           <TopBar />
-          <main className="mx-auto w-full max-w-[1400px] px-4 py-6">{children}</main>
+          <main className="mx-auto w-full max-w-[1500px] px-3 py-4">{children}</main>
         </div>
       </div>
       <AchievementsWatcher />
