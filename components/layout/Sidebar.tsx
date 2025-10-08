@@ -113,6 +113,8 @@ export function Sidebar() {
             <div className="space-y-1">
               {SAMPLE_SPACES.map((space) => {
                 const open = openSpaces[space.id] ?? true;
+                const base = `/spaces/${space.name.toLowerCase()}`;
+                const spaceActive = pathname.startsWith(base);
                 return (
                   <div key={space.id} className="rounded-lg">
                     <button className={cn("w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted", collapsed && "justify-center")}
@@ -123,34 +125,27 @@ export function Sidebar() {
                     {open && (
                       <div className={cn("mt-0.5 pl-6 space-y-0.5", collapsed && "hidden") }>
                         {/* Space main link */}
-                        {(() => {
-                          const base = `/spaces/${space.name.toLowerCase()}`;
-                          const active = pathname.startsWith(base);
-                          return (
-                            <Link href={base} className={cn(
-                              "flex items-center gap-2 px-2 py-1.5 rounded-md border border-transparent hover:bg-white/5 hover:border-white/10",
-                              active && "bg-white/5 border-white/15"
-                            )}>
-                              <Folder className="h-4 w-4" />
-                              <span className="text-[13px] truncate">{space.name} Overview</span>
-                            </Link>
-                          );
-                        })()}
+                        <Link href={base} className={cn(
+                          "flex items-center gap-2 px-2 py-1.5 rounded-md border border-transparent hover:bg-white/5 hover:border-white/10",
+                          spaceActive && "bg-white/5 border-white/15"
+                        )}>
+                          <Folder className="h-4 w-4" />
+                          <span className="text-[13px] truncate">{space.name} Overview</span>
+                        </Link>
                         {space.projects.map((p) => {
-                          const projectHref = (() => {
-                            const s = space.name.toLowerCase();
-                            const pn = p.name.toLowerCase();
-                            if (s === "personal") {
-                              if (pn === "health") return "/spaces/health";
-                              if (pn === "learning") return "/spaces/learning";
-                            }
-                            if (s === "work" && pn === "side project") return "/spaces/work/side-project";
-                            return `/spaces/${pn}`;
-                          })();
+                          const s = space.name.toLowerCase();
+                          const pn = p.name.toLowerCase();
+                          let projectHref = `/spaces/${pn}`;
+                          if (s === "personal") {
+                            if (pn === "health") projectHref = "/spaces/health";
+                            if (pn === "learning") projectHref = "/spaces/learning";
+                          }
+                          if (s === "work" && pn === "side project") projectHref = "/spaces/work/side-project";
                           const projectActive = pathname.startsWith(projectHref);
                           return (
                             <div key={p.id}>
-                              <Link href={projectHref} className={cn("flex items-center gap-2 px-2 py-1.5 rounded-md border border-transparent hover:bg-white/5 hover:border-white/10",
+                              <Link href={projectHref} className={cn(
+                                "flex items-center gap-2 px-2 py-1.5 rounded-md border border-transparent hover:bg-white/5 hover:border-white/10",
                                 projectActive && "bg-white/5 border-white/15"
                               )}>
                                 <Folder className="h-4 w-4" />
@@ -158,27 +153,24 @@ export function Sidebar() {
                               </Link>
                               <div className="pl-6 space-y-0.5">
                                 {p.notes.map((n) => {
-                                  const noteHref = (() => {
-                                    const s = space.name.toLowerCase();
-                                    const pn = p.name.toLowerCase();
-                                    const nn = n.toLowerCase();
-                                    if (s === "personal" && pn === "health") {
-                                      if (nn === "nutrition") return "/spaces/health/nutrition";
-                                      if (nn === "workouts") return "/spaces/health/workouts";
-                                    }
-                                    if (s === "personal" && pn === "learning") {
-                                      if (nn === "books") return "/spaces/learning/books";
-                                      if (nn === "courses") return "/spaces/learning/courses";
-                                    }
-                                    if (s === "work" && pn === "side project") {
-                                      if (nn === "ideas") return "/spaces/work/ideas";
-                                      if (nn === "milestones") return "/spaces/work/milestones";
-                                    }
-                                    return projectHref;
-                                  })();
+                                  const nn = n.toLowerCase();
+                                  let noteHref = projectHref;
+                                  if (s === "personal" && pn === "health") {
+                                    if (nn === "nutrition") noteHref = "/spaces/health/nutrition";
+                                    if (nn === "workouts") noteHref = "/spaces/health/workouts";
+                                  }
+                                  if (s === "personal" && pn === "learning") {
+                                    if (nn === "books") noteHref = "/spaces/learning/books";
+                                    if (nn === "courses") noteHref = "/spaces/learning/courses";
+                                  }
+                                  if (s === "work" && pn === "side project") {
+                                    if (nn === "ideas") noteHref = "/spaces/work/ideas";
+                                    if (nn === "milestones") noteHref = "/spaces/work/milestones";
+                                  }
                                   const noteActive = pathname.startsWith(noteHref);
                                   return (
-                                    <Link key={n} href={noteHref} className={cn("flex items-center gap-2 px-2 py-1.5 rounded-md border border-transparent hover:bg-white/5 hover:border-white/10",
+                                    <Link key={n} href={noteHref} className={cn(
+                                      "flex items-center gap-2 px-2 py-1.5 rounded-md border border-transparent hover:bg-white/5 hover:border-white/10",
                                       noteActive && "bg-white/5 border-white/15"
                                     )}>
                                       <FileText className="h-4 w-4" />
@@ -195,6 +187,7 @@ export function Sidebar() {
                   </div>
                 );
               })}
+            </div>
           </div>
 
         </div>
