@@ -117,34 +117,84 @@ export function Sidebar() {
                   <div key={space.id} className="rounded-lg">
                     <button className={cn("w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted", collapsed && "justify-center")}
                       onClick={() => toggleSpace(space.id)}>
-                      <ChevronDown className={cn("h-4 w-4 transition", !open && "-rotate-90", collapsed && "hidden")} />
                       <Folder className="h-4 w-4" />
                       {!collapsed && <span className="text-[13px] font-medium truncate">{space.name}</span>}
                     </button>
                     {open && (
                       <div className={cn("mt-0.5 pl-6 space-y-0.5", collapsed && "hidden") }>
-                        {space.projects.map((p) => (
-                          <div key={p.id} className="">
-                            <Link href={`/habits?q=${encodeURIComponent(p.name)}`} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted">
+                        {/* Space main link */}
+                        {(() => {
+                          const base = `/spaces/${space.name.toLowerCase()}`;
+                          const active = pathname.startsWith(base);
+                          return (
+                            <Link href={base} className={cn(
+                              "flex items-center gap-2 px-2 py-1.5 rounded-md border border-transparent hover:bg-white/5 hover:border-white/10",
+                              active && "bg-white/5 border-white/15"
+                            )}>
                               <Folder className="h-4 w-4" />
-                              <span className="text-[13px] truncate">{p.name}</span>
+                              <span className="text-[13px] truncate">{space.name} Overview</span>
                             </Link>
-                            <div className="pl-6 space-y-0.5">
-                              {p.notes.map((n) => (
-                                <Link key={n} href={`/habits?q=${encodeURIComponent(n)}`} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted">
-                                  <FileText className="h-4 w-4" />
-                                  <span className="text-[13px] truncate">{n}</span>
-                                </Link>
-                              ))}
+                          );
+                        })()}
+                        {space.projects.map((p) => {
+                          const projectHref = (() => {
+                            const s = space.name.toLowerCase();
+                            const pn = p.name.toLowerCase();
+                            if (s === "personal") {
+                              if (pn === "health") return "/spaces/health";
+                              if (pn === "learning") return "/spaces/learning";
+                            }
+                            if (s === "work" && pn === "side project") return "/spaces/work/side-project";
+                            return `/spaces/${pn}`;
+                          })();
+                          const projectActive = pathname.startsWith(projectHref);
+                          return (
+                            <div key={p.id}>
+                              <Link href={projectHref} className={cn("flex items-center gap-2 px-2 py-1.5 rounded-md border border-transparent hover:bg-white/5 hover:border-white/10",
+                                projectActive && "bg-white/5 border-white/15"
+                              )}>
+                                <Folder className="h-4 w-4" />
+                                <span className="text-[13px] truncate">{p.name}</span>
+                              </Link>
+                              <div className="pl-6 space-y-0.5">
+                                {p.notes.map((n) => {
+                                  const noteHref = (() => {
+                                    const s = space.name.toLowerCase();
+                                    const pn = p.name.toLowerCase();
+                                    const nn = n.toLowerCase();
+                                    if (s === "personal" && pn === "health") {
+                                      if (nn === "nutrition") return "/spaces/health/nutrition";
+                                      if (nn === "workouts") return "/spaces/health/workouts";
+                                    }
+                                    if (s === "personal" && pn === "learning") {
+                                      if (nn === "books") return "/spaces/learning/books";
+                                      if (nn === "courses") return "/spaces/learning/courses";
+                                    }
+                                    if (s === "work" && pn === "side project") {
+                                      if (nn === "ideas") return "/spaces/work/ideas";
+                                      if (nn === "milestones") return "/spaces/work/milestones";
+                                    }
+                                    return projectHref;
+                                  })();
+                                  const noteActive = pathname.startsWith(noteHref);
+                                  return (
+                                    <Link key={n} href={noteHref} className={cn("flex items-center gap-2 px-2 py-1.5 rounded-md border border-transparent hover:bg-white/5 hover:border-white/10",
+                                      noteActive && "bg-white/5 border-white/15"
+                                    )}>
+                                      <FileText className="h-4 w-4" />
+                                      <span className="text-[13px] truncate">{n}</span>
+                                    </Link>
+                                  );
+                                })}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </div>
                 );
               })}
-            </div>
           </div>
 
         </div>
